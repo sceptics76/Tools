@@ -9,6 +9,7 @@ Build an org chart in the browser without Visio. Everything is in one file, `ind
 - **Drag a card to the left or right edge of a peer** to reorder. The person's whole team moves with them.
 - **Paste a list** to add many people at once, either as an indented outline or as spreadsheet rows (Name, Role, Manager, Department).
 - Collapse teams, stack small teams vertically, and undo or redo changes.
+- Light and dark mode, switched with the sun/moon button on the toolbar and remembered in your browser.
 - Export to PNG, SVG, CSV, or a text outline you can paste back in later.
 
 ## Paste format

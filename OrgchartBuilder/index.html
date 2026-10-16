@@ -7,6 +7,15 @@
 <meta name="description" content="Build an org chart in the browser: add people with names, roles and departments, drag to arrange, paste a list, export to PNG, SVG or CSV.">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500&display=swap">
 <style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui,-apple-system,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>
+<script>
+/* Apply the saved light/dark choice before the page paints. First visit follows the system setting. */
+(function(){
+  var t = null;
+  try { t = localStorage.getItem("org-chart-theme"); } catch (e) {}
+  if (t !== "light" && t !== "dark") t = window.matchMedia && matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+  document.documentElement.setAttribute("data-theme", t);
+})();
+</script>
 <style id="app-style">
 /* Layout: full-height workspace. Toolbar on top, dotted canvas on the left, editor panel on the right (bottom sheet on phones). */
 :root{
@@ -197,6 +206,7 @@ var SHELL = '' +
       '<button id="btn-undo" class="icon" title="Undo (Ctrl+Z)" aria-label="Undo">&#8630;</button>' +
       '<button id="btn-redo" class="icon" title="Redo (Ctrl+Shift+Z)" aria-label="Redo">&#8631;</button>' +
     '</div>' +
+    '<button id="btn-theme" class="icon" type="button"></button>' +
     '<button id="btn-add" class="btn">+ Person</button>' +
     '<button id="btn-paste" class="btn">Paste a list</button>' +
     '<label class="switch" title="Show teams of 3 or more people with no reports of their own as a vertical list"><input type="checkbox" id="opt-stack"><span>Stack small teams</span></label>' +
@@ -723,6 +733,20 @@ $("opt-stack").addEventListener("change", function(e){ var v = e.target.checked;
 $("btn-zin").onclick = function(){ zoomCenter(1.2); };
 $("btn-zout").onclick = function(){ zoomCenter(1 / 1.2); };
 $("btn-fit").onclick = fit;
+function syncThemeButton(){
+  var dark = document.documentElement.getAttribute("data-theme") === "dark";
+  var b = $("btn-theme");
+  b.innerHTML = dark ? "&#9728;&#xFE0E;" : "&#9790;&#xFE0E;";
+  b.title = dark ? "Switch to light mode" : "Switch to dark mode";
+  b.setAttribute("aria-label", b.title);
+}
+$("btn-theme").onclick = function(){
+  var next = document.documentElement.getAttribute("data-theme") === "dark" ? "light" : "dark";
+  document.documentElement.setAttribute("data-theme", next);
+  try { localStorage.setItem("org-chart-theme", next); } catch (e) {}
+  syncThemeButton();
+};
+syncThemeButton();
 $("btn-blank").onclick = function(){
   var id = uid();
   commit(function(){ state.title = "Org chart"; state.people = [{ id: id, name: "", role: "", dept: "", parent: null, collapsed: false }]; });
